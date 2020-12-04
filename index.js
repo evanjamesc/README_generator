@@ -1,11 +1,13 @@
+// Package installs (had to research 'util' async to fix an error with some code running out of order)
 const inquirer = require('inquirer');
 const fs = require('fs');
 const util = require('util');
-
 const writeFileAsync = util.promisify(fs.writeFile);
 
+// Prompt user for input which will be written to README.md
 let promptUser = () => {
     return inquirer.prompt([
+        // Title
         {
             type: 'input',
             message: 'What is the title of your project?',
@@ -41,6 +43,7 @@ let promptUser = () => {
             message: 'Enter testing instructions for your project:',
             name: 'testing',
         },
+        // License
         {
             type: 'checkbox',
             message: 'Select a software license:',
@@ -51,11 +54,13 @@ let promptUser = () => {
             ],
             name: 'license',
         },
+        // GitHub username
         {
             type: 'input',
             message: 'Please enter your GitHub username:',
             name: 'gitHub',
         },
+        // Email address
         {
             type: 'input',
             message: 'Please enter your email address:',
@@ -64,7 +69,7 @@ let promptUser = () => {
     ]);
 
 };
-
+// This function takes the user input from promptUser and puts it in markdown language
 function generateReadme(response) {
     return `
 # ${response.title}
@@ -72,11 +77,17 @@ function generateReadme(response) {
 # Table of Contents
 
 -[Description](#description)
+
 -[Installation](#installation)
--[Usage instructions](#usage)
+
+-[Usage](#usage)
+
 -[Contribution](#contribution)
--[Testing](#testing)
+
+-[Tests](#testing)
+
 -[License](#license)
+
 -[Questions](#questions)
 
 ## Description:
@@ -93,7 +104,7 @@ ${response.contribution}
 ${response.testing}
 ## License:
 This program is covered under the ${response.license} license.
-- [${response.license} license documentation](https://opensource.org/licenses/${response.license})
+- [${response.license} License Documentation](https://opensource.org/licenses/${response.license})
 ## Questions:
 Questions? Find me on GitHub:
 https://github.com/${response.gitHub}
@@ -102,19 +113,15 @@ or email me at:
 ${response.email}
 `;
 }
-
+// Function to start the application once user opens with node
 async function init() {
 
-    try {
         const response = await promptUser();
         const readMe = generateReadme(response);
-        console.log(readMe);
         await writeFileAsync("README.md", readMe);
-        console.log("Success");
-    } catch (err) {
-        console.log(err);
-    }
-}
+        console.log("Generated README.md");
 
+}
+// Initialize program
 init();
 
