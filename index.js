@@ -41,16 +41,80 @@ let promptUser = () => {
             message: 'Enter testing instructions for your project:',
             name: 'testing',
         },
-    ])
-        .then((response) => {
-            console.log(response.title);
-            console.log(response.description);
-            console.log(response.installation);
-            console.log(response.usage);
-            console.log(response.contribution);
-            console.log(response.testing);
-        }
-        );
+        {
+            type: 'checkbox',
+            message: 'Select a software license:',
+            choices: [
+                "MIT",
+                "Apache",
+                "ISC",
+            ],
+            name: 'license',
+        },
+        {
+            type: 'input',
+            message: 'Please enter your GitHub username:',
+            name: 'gitHub',
+        },
+        {
+            type: 'input',
+            message: 'Please enter your email address:',
+            name: 'email',
+        },
+    ]);
+
 };
 
-promptUser();
+function generateReadme(response) {
+    return `
+# ${response.title}
+
+# Table of Contents
+
+-[Description](#description)
+-[Installation](#installation)
+-[Usage instructions](#usage)
+-[Contribution](#contribution)
+-[Testing](#testing)
+-[License](#license)
+-[Questions](#questions)
+
+## Description:
+[![License](https://img.shields.io/badge/License-${response.license}-purple.svg)](https://opensource.org/licenses/${response.license})
+
+${response.description}
+## Installation:
+${response.installation}
+## Usage:
+${response.usage}
+## Contributing:
+${response.contribution}
+## Tests:
+${response.testing}
+## License:
+This program is covered under the ${response.license} license.
+- [${response.license} license documentation](https://opensource.org/licenses/${response.license})
+## Questions:
+Questions? Find me on GitHub:
+https://github.com/${response.gitHub}
+
+or email me at:
+${response.email}
+`;
+}
+
+async function init() {
+
+    try {
+        const response = await promptUser();
+        const readMe = generateReadme(response);
+        console.log(readMe);
+        await writeFileAsync("README.md", readMe);
+        console.log("Success");
+    } catch (err) {
+        console.log(err);
+    }
+}
+
+init();
+
